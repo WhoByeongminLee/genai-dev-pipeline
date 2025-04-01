@@ -15,14 +15,14 @@ from generator.s3_handler import S3Handler
 
 def write_log_to_s3(log_content: str, target_date: str):
     # 로그 내용을 S3에 저장
-    s3 = boto3.client('s3')
+    s3 = boto3.client("s3")
     log_key = f"{BASE_PREFIX}/logs/processing/{target_date}.log"
-    s3.put_object(Bucket=TARGET_BUCKET, Key=log_key, Body=log_content.encode('utf-8'))
+    s3.put_object(Bucket=TARGET_BUCKET, Key=log_key, Body=log_content.encode("utf-8"))
 
 
 if __name__ == "__main__":
     start_time = datetime.now()
-    target_date = (datetime.today() - timedelta(days=1)).strftime('%Y-%m-%d')
+    target_date = (datetime.today() - timedelta(days=1)).strftime("%Y-%m-%d")
     data_ids = [f"DT_AIG_{str(i).zfill(4)}" for i in DATA_ID_RANGE]
 
     s3_handler = S3Handler(SOURCE_BUCKET, TARGET_BUCKET, BASE_PREFIX)
