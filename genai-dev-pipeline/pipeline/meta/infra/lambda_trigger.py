@@ -17,7 +17,7 @@ def lambda_handler(event, context):
         ProcessingResources={
             "ClusterConfig": {
                 "InstanceCount": 1,
-                "InstanceType": "ml.t3.medium",
+                "InstanceType": "ml.t3.mediulsm",
                 "VolumeSizeInGB": 10,
             }
         },
