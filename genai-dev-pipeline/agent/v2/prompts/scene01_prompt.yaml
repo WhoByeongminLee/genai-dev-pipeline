@@ -1,8 +1,9 @@
 template: |
   Product: {product}
   Concept: {concept}
+  Retrieved Info: {retrieved_info}
 
-  Write a catchy and engaging marketing copy based on the product and concept above.
+  Based on the above information, write a catchy and engaging marketing copy.
 input_variables:
   - product
   - concept
