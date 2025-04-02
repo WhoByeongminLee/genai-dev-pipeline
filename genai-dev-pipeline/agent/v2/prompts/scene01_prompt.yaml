@@ -1,0 +1,8 @@
+template: |
+  Product: {product}
+  Concept: {concept}
+
+  Write a catchy and engaging marketing copy based on the product and concept above.
+input_variables:
+  - product
+  - concept
