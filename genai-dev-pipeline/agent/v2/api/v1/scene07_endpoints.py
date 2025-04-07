@@ -1,1 +1,0 @@
-# sqlgen_endpoints.py

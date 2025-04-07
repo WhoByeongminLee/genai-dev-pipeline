@@ -1,60 +1,42 @@
-1. CloudWatch Events + Lambda + Notebook 실행
+# README.md
 
-AWS에서는 CloudWatch Events (EventBridge) + Lambda를 통해
-Notebook 인스턴스 안의 Python Script를 주기적으로 실행하는 방법을 공식적으로 제공함
+# AIG RAG 메타데이터 파이프라인
 
-CloudWatch Events (매일 3시 트리거)
-         ↓
-AWS Lambda → SageMaker API 호출 → Jupyter Notebook (.py) 스크립트 실행
+## 개요
+이 프로젝트는 AIG 데이터 수집용 S3 원본 파일을 처리하여
+전송 파일과 메타데이터 JSON 파일을 자동으로 생성 및 저장하는 파이프라인입니다.
 
+## 주요 기능
+- S3 원본 파일 이름 → 전송 규칙 파일명으로 변경 및 복사
+- 메타데이터 파일 자동 생성
+- 날짜별, 데이터설계번호별 일괄 처리 가능
+- 처리 로그 자동 생성 및 S3에 업로드
 
-1) bash: jupyter nbconvert --to script run_meta_pipeline.ipynb
-2) CloudWatch Rule 생성 (3시 트리거) - 스케줄: cron(0 18 * * ? *) (UTC 기준, 한국시간 새벽 3시는 UTC 18시)
-3) Lambda Function 생성: 
-권한 부여: Lambda에 다음 권한 필요
-SageMaker: sagemaker:StartNotebookInstance
-SageMaker: sagemaker:CreateProcessingJob
-CloudWatch Logs
-코드예시:
+## S3 경로 구조
+S3 경로는 다음과 같은 Rule 기반으로 동적으로 생성됩니다.
 
-import boto3
-def lambda_handler(event, context):
-    client = boto3.client('sagemaker')
-    response = client.create_processing_job(
-        ProcessingJobName='meta-pipeline-job',
-        ProcessingResources={
-            'ClusterConfig': {
-                'InstanceCount': 1,
-                'InstanceType': 'ml.t3.medium',
-                'VolumeSizeInGB': 10
-            }
-        },
-        AppSpecification={
-            'ImageUri': 'YOUR-SAGEMAKER-IMAGE-URI',
-            'ContainerEntrypoint': [
-                'python3',
-                '/opt/ml/processing/input/run_meta_pipeline.py'
-            ]
-        },
-        RoleArn='YOUR_SAGEMAKER_ROLE_ARN',
-        ProcessingInputs=[{
-            'InputName': 'input-1',
-            'S3Input': {
-                'S3Uri': 's3://your-bucket/meta-scripts/',
-                'LocalPath': '/opt/ml/processing/input',
-                'S3DataType': 'S3Prefix',
-                'S3InputMode': 'File'
-            }
-        }],
-        ProcessingOutputConfig={
-            'Outputs': []
-        }
-    )
-    print(response)
+```
+/{base_prefix}/raw/{data_id}/{year}/{yyyymm}/{yyyymmdd}/
+/{base_prefix}/prpr/{data_id}/{year}/{yyyymm}/{yyyymmdd}/
+/{base_prefix}/log/{data_id}/{year}/{yyyymm}/{yyyymmdd}/
+```
 
+경로 변경 시 `config/settings.py` 내 `S3_PATH_RULE` 값만 수정하면 전체 파이프라인에 자동 반영됩니다.
 
- (선택) Crontab 대안: SageMaker Studio의 Scheduler 사용
-최근에는 SageMaker Studio → Schedule Jobs 기능도 제공되어, SageMaker 자체에서 Python Script Scheduling 가능
+## 실행 방법
 
-가장쉽게:
-S3에 .py올리고 Lambda+EventBridge Rule 설정
+1. 하루치 전체 일괄 처리 (배치)
+```bash
+python meta/orchestrator/run_meta_pipeline.py
+```
+
+2. SageMaker Lambda 트리거도 지원 (`infra/lambda_trigger.py` 참고)
+
+## 주요 폴더 구조
+```
+meta/
+├── config/         # 설정 파일
+├── generator/      # S3 핸들러, 경로 Resolver, 파일명 Generator 등
+├── orchestrator/   # 파이프라인 실행
+└── infra/          # Lambda Trigger (옵션)
+```

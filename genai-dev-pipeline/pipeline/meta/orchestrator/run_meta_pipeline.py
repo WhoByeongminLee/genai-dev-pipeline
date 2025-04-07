@@ -1,3 +1,5 @@
+# meta/orchestrator/run_meta_pipeline.py
+
 import sys
 import os
 from datetime import datetime, timedelta
@@ -11,14 +13,6 @@ sys.path.append(parent_dir)
 from meta_pipeline import MetaPipeline
 from config.settings import SOURCE_BUCKET, TARGET_BUCKET, BASE_PREFIX, DATA_ID_RANGE
 from generator.s3_handler import S3Handler
-
-
-def write_log_to_s3(log_content: str, target_date: str):
-    # 로그 내용을 S3에 저장
-    s3 = boto3.client("s3")
-    log_key = f"{BASE_PREFIX}/logs/processing/{target_date}.log"
-    s3.put_object(Bucket=TARGET_BUCKET, Key=log_key, Body=log_content.encode("utf-8"))
-
 
 if __name__ == "__main__":
     start_time = datetime.now()
@@ -53,26 +47,24 @@ if __name__ == "__main__":
             log_msg = f"[DONE] {data_id} - 파일 {len(source_files)}건 처리 완료"
             print(log_msg)
             logs.append(log_msg)
-            processed_count += 1
         except Exception as e:
             log_msg = f"[ERROR] {data_id} - {str(e)}"
             print(log_msg)
             logs.append(log_msg)
 
-    end_time = datetime.now()
-    elapsed = end_time - start_time
+        end_time = datetime.now()
+        elapsed = end_time - start_time
 
-    # 요약 로그
-    logs.append("\n[SUMMARY]")
-    logs.append(f"총 데이터설계번호: {len(data_ids)}")
-    logs.append(f"처리 완료: {processed_count}")
-    logs.append(f"스킵: {skipped_count}")
-    logs.append(f"시작 시간: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
-    logs.append(f"종료 시간: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
-    logs.append(f"전체 소요 시간: {str(elapsed)}")
+        logs.append("\n[SUMMARY]")
+        logs.append(f"데이터설계번호: {data_id}")
+        logs.append(f"처리 완료: {'1' if data_id not in logs[-1] else '0'}")
+        logs.append(f"스킵: {'1' if data_id in logs[-1] else '0'}")
+        logs.append(f"시작 시간: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        logs.append(f"종료 시간: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        logs.append(f"전체 소요 시간: {str(elapsed)}")
 
-    # S3에 로그 저장
-    full_log = "\n".join(logs)
-    write_log_to_s3(full_log, target_date)
+        full_log = "\n".join(logs)
+        log_key = s3_handler.upload_log(full_log, data_id, target_date)
+        print(f"[INFO] 로그 저장 완료: {log_key}")
 
-    print("[INFO] 배치 작업 완료. 로그 저장 완료.")
+    print("[INFO] 배치 작업 완료.")

@@ -2,7 +2,7 @@
 name = "bmlee-kr"
 version = "0.1.1"
 description = "Packages for AI Agent"
-authors = ["bmlee <bmlee@lgcns.com>"]
+authors = ["Byeong Min Lee <bmlee.data@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 package-mode = false
@@ -92,6 +92,19 @@ mypy = "^1.11.2"
 pinecone = "^5.3.1"
 wikipedia = "^1.4.0"
 scikit-learn = "^1.5.2"
+teradataml = "^20.0.0.4"
+teradatasql = "^20.0.0.28"
+timedelta = "^2020.12.3"
+datetime = "^5.5"
+csv342 = "^1.0.1"
+pdfminer = "^20191125"
+boto3 = "^1.37.28"
+python-docx = "^1.1.2"
+requests = "^2.32.3"
+pyyaml = "^6.0.2"
+pytest = "^8.3.5"
+ipykernel = "^6.29.5"
+flask = "^3.1.0"
 
 [build-system]
 requires = ["poetry-core"]

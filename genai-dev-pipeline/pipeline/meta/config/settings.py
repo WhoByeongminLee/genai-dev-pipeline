@@ -1,6 +1,13 @@
-SOURCE_BUCKET = 'aig-rag-data-prod'
-TARGET_BUCKET = 'aig-rag-data-prod'
-BASE_PREFIX = 'aig-rag-data-prod'
+# meta/config/settings.py
 
-# 데이터설계번호 범위 설정
-DATA_ID_RANGE = range(1, 18)  # 0001 ~ 0017 까지 처리
+SOURCE_BUCKET = 'ks2-kai-dev-kabie-s3-agent'
+TARGET_BUCKET = 'ks2-kai-dev-kabie-s3-agent'
+BASE_PREFIX = 'incpyjbinvt/mrktg'
+
+DATA_ID_RANGE = range(1, 17 + 1)  # 0001 ~ 0017
+
+S3_PATH_RULE = {
+    "raw": "{base_prefix}/raw/{data_id}/{year}/{yyyymm}/{yyyymmdd}/",
+    "prpr": "{base_prefix}/prpr/{data_id}/{year}/{yyyymm}/{yyyymmdd}/",
+    "log": "{base_prefix}/log/{data_id}/{year}/{yyyymm}/{yyyymmdd}/"
+}

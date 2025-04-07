@@ -106,3 +106,27 @@ sh scripts/run_retriever_batch.sh
 
 ## 라이선스
 사내 프로젝트용 Private Repository
+
+
+
+
+# 서버실행:
+uvicorn agent.main:app --reload
+
+
+# 내부망에서 설치 방법
+pip install --no-index --find-links=. -r ../requirements.txt
+
+
+레이어	구성 파일 예시
+API 라우터	scene01_endpoints.py
+유즈케이스	scene01_orchestrator.py
+요청 모델	schema/scene01/request.py
+응답 모델	schema/scene01/response.py
+프롬프트	prompts/scene01_prompt.yaml
+외부 연동	core/llm_client.py, core/retriever_client.py
+설정	config/settings.py
+메인 실행	main.py
+
+사용자 요청 → 1. 히스토리 요약 → 2. 프롬프트 결합
+           → 3. RAG 기반 강화 → 4. 채널별 메시지 생성 → 5. 응답 문자열 구성
