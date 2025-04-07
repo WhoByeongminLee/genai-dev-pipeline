@@ -130,3 +130,22 @@ API 라우터	scene01_endpoints.py
 
 사용자 요청 → 1. 히스토리 요약 → 2. 프롬프트 결합
            → 3. RAG 기반 강화 → 4. 채널별 메시지 생성 → 5. 응답 문자열 구성
+
+
+# 예시요청
+POST /api/v1/scene01/generate
+Content-Type: application/json
+
+{
+  "message_type": "광고심의문구",
+  "life_stage": "시니어세대",
+  "channels": ["PUSH", "알림톡"],
+  "prompt": "신규 가입 고객에게 혜택을 안내하는 문구를 100자 이내로 만들어줘",
+  "file_url": "https://your-s3-url.com/sample.pdf",
+  "session_id": "session_abc123",
+  "history": [
+    {"user": "이벤트에 대한 안내 문구를 작성해줘", "ai": "고객님을 위한 특별한 이벤트! 지금 바로 확인하세요."},
+    {"user": "조금 더 포멀한 톤으로 바꿔줘", "ai": "고객님의 성원에 감사드리며, 특별한 혜택을 준비했습니다."},
+    {"user": "100자 이내로 요약해줘", "ai": "감사 이벤트! 지금 확인하세요."}
+  ]
+}

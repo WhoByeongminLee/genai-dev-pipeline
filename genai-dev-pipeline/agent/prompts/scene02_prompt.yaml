@@ -1,8 +1,0 @@
-template: |
-  Title: {title}
-  Topic: {topic}
-
-  Write a detailed and engaging article draft about the topic above.
-input_variables:
-  - title
-  - topic

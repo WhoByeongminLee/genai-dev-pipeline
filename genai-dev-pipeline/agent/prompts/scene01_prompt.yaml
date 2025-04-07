@@ -1,9 +1,0 @@
-template: |
-  Product: {product}
-  Concept: {concept}
-  Retrieved Info: {retrieved_info}
-
-  Based on the above information, write a catchy and engaging marketing copy.
-input_variables:
-  - product
-  - concept

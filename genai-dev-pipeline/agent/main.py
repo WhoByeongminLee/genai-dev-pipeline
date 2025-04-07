@@ -1,13 +1,14 @@
+# agent/main.py
+
 from fastapi import FastAPI
-from agent.api.v1 import scene01_endpoints, scene02_endpoints
+from agent.api.router import api_router
 
 app = FastAPI(
     title="GenAI Knowledge Agent",
     version="1.0.0"
 )
 
-app.include_router(scene01_endpoints.router, prefix="/v1")
-app.include_router(scene02_endpoints.router, prefix="/v1")
+app.include_router(api_router)
 
 @app.get("/")
 def root():
