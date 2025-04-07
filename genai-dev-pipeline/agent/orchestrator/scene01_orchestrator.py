@@ -37,7 +37,8 @@ class Scene01Orchestrator:
             history=history_block,
             user_prompt=request.prompt,
             life_stage=request.life_stage,
-            file_summary=file_summary
+            file_summary=file_summary,
+            channels=[c.value for c in request.channels]
         )
 
         # 4. RAG 기반 강화 프롬프트 호출
@@ -64,7 +65,8 @@ class Scene01Orchestrator:
             generated_messages.append(GeneratedMessage(channel=channel.value, content=response_text.strip()))
 
         # 6. 응답 문자열 구성
-        result = "\n".join([f"{m.channel}: {m.content}" for m in generated_messages])
+        result = "\n\n".join([f"[{m.channel}]\n{m.content}" for m in generated_messages])
+        # result = "\n".join([f"{m.channel}: {m.content}" for m in generated_messages])
 
         return Scene01Response(
             result=result,
@@ -77,10 +79,10 @@ class Scene01Orchestrator:
         if not history:
             return ""
         return "\n".join([f"User: {turn.user}\nAI: {turn.ai}" for turn in history])
-
+    
     async def _summarize_uploaded_file(self, file_url: str) -> str:
         logger.info(f"Summarizing uploaded file: {file_url}")
-        return "[기획안 요약]: (요약된 내용이 여기에 들어갑니다)"  # TODO: LangChain 기반으로 확장 예정
+        return f"[기획안 요약]: {file_url}(요약된 내용이 여기에 들어갑니다)"  # TODO: LangChain 기반으로 확장 예정
 
     async def _retrieve_knowledge_with_rag(self, message_type: str, life_stage: str, channels: List[str], query: str) -> str:
         agent_id = self._select_agent_id_by_message_type(message_type)
@@ -94,14 +96,14 @@ class Scene01Orchestrator:
     def _select_agent_id_by_message_type(self, message_type: str) -> int:
         return self.agent_id_map.get(message_type, 0)  # 기본값 0 또는 예외 처리
 
-    def _build_base_prompt(self, history: str, user_prompt: str, life_stage: str, file_summary: str) -> str:
+    def _build_base_prompt(self, history: str, user_prompt: str, life_stage: str, file_summary: str, channels: List[str]) -> str:
         template = PromptTemplate.from_template(self.prompt_config["user_prompt_template"])
         return template.format(
             history=history,
             user_prompt=user_prompt,
             life_stage=life_stage,
             file_summary=file_summary,
-            channel="",  # 초기에는 채널 정보 없음
+            channel=", ".join(channels),
             rag_knowledge=""
         )
 
@@ -111,6 +113,11 @@ class Scene01Orchestrator:
         return f"{base_prompt}\n\n{channel_part}"
 
     def _load_prompt_yaml(self, scene: str, version: str, name: str) -> dict:
+        path = Path(__file__).parent.parent / "prompts" / scene / version / name
+        with open(path, "r", encoding="utf-8") as f:
+            return yaml.safe_load(f)
+        """
         path = Path(f"prompts/{scene}/{version}/{name}")
         with open(path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
+        """

@@ -27,7 +27,8 @@ class Scene01Request(BaseModel):
     life_stage: str = Field(..., description="라이프스테이지 (예: 사회초년생)")
     channels: List[ChannelType] = Field(..., description="발송 채널들")
     prompt: str = Field(..., description="현재 사용자 입력 프롬프트")
-    file_url: Optional[HttpUrl] = Field(None, description="기획안 파일 URL (선택)")
+    file_url: Optional[str] = None
+    # file_url: Optional[HttpUrl] = Field(None, description="기획안 파일 URL (선택)")
     session_id: Optional[str] = Field(None, description="세션 식별자 (히스토리 트래킹 용)")
     history: Optional[List[ChatTurn]] = Field(
         None, description="가장 최근 3개 문답의 히스토리"

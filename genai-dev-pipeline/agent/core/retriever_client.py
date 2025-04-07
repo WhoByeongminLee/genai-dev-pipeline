@@ -5,6 +5,11 @@ import httpx
 from agent.config.settings import settings
 
 class RetrieverClient:
+
+    async def retrieve_and_generate(self, agent_id: int, query: str, llm_config: dict) -> str:
+        # MOCK 응답
+        return f"(MOCK_RAG_KNOWLEDGE for agent_id={agent_id})"
+
     def __init__(self):
         self.headers = {
             "x-openapi-token": settings.OPENAPI_TOKEN,
@@ -15,6 +20,9 @@ class RetrieverClient:
         self.endpoint = f"{settings.BASE_URL}/dev/kbcommon/agentv1/1/openapi/agent-chat/v1/agent-messages"
 
     async def retrieve_and_generate(self, agent_id: int, query: str, llm_config: dict) -> str:
+        if settings.IS_MOCK_MODE:
+            return f"(MOCK_RAG_KNOWLEDGE for agent_id={agent_id})"
+        
         body = {
             "agentId": agent_id,
             "contents": [query],
